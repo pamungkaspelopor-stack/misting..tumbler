@@ -1,0 +1,2233 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lomba Misting dan Tumbler - SDN 190 Cisaranten Kidul</title>
+  <style>
+    :root {
+      --primary: #0284c7;
+      --primary-dark: #0369a1;
+      --secondary: #10b981;
+      --accent: #8b5cf6;
+      --pink: #ec4899;
+      --amber: #f59e0b;
+      --danger: #ef4444;
+      --bg-gradient: linear-gradient(135deg, #e0f2fe 0%, #ecfdf5 45%, #f5f3ff 78%, #fdf2f8 100%);
+      --card: rgba(255, 255, 255, 0.95);
+      --text: #0f172a;
+      --muted: #64748b;
+      --border: #e2e8f0;
+      --shadow-sm: 0 4px 12px rgba(2, 132, 199, 0.08);
+      --shadow-md: 0 12px 28px rgba(2, 132, 199, 0.14);
+      --shadow-lg: 0 20px 45px rgba(16, 185, 129, 0.18);
+      --radius: 16px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: "Plus Jakarta Sans", "Segoe UI", Roboto, -apple-system, BlinkMacSystemFont, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background: var(--bg-gradient);
+      background-attachment: fixed;
+      color: var(--text);
+      line-height: 1.55;
+      min-height: 100vh;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    /* Ambient Glow */
+    body::before,
+    body::after {
+      content: "";
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(75px);
+      z-index: -1;
+      pointer-events: none;
+    }
+
+    body::before {
+      width: 360px;
+      height: 360px;
+      background: rgba(14, 165, 233, 0.18);
+      top: -80px;
+      left: -80px;
+    }
+
+    body::after {
+      width: 380px;
+      height: 380px;
+      background: rgba(16, 185, 129, 0.16);
+      bottom: -90px;
+      right: -90px;
+    }
+
+    /* Topbar */
+    .topbar {
+      background: linear-gradient(120deg, #0c4a6e 0%, #0284c7 42%, #0d9488 78%, #7c3aed 100%);
+      color: #fff;
+      padding: 14px 22px;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      box-shadow: 0 8px 25px rgba(2, 132, 199, 0.28);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.22);
+    }
+
+    .topbar-inner {
+      max-width: 1380px;
+      margin: 0 auto;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .brand-badge {
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #34d399 0%, #0ea5e9 55%, #a855f7 100%);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      font-size: 16px;
+      letter-spacing: -0.4px;
+      box-shadow: 0 6px 16px rgba(16, 185, 129, 0.42);
+      border: 2px solid rgba(255, 255, 255, 0.65);
+    }
+
+    .brand h1 {
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: 0.2px;
+    }
+
+    .brand p {
+      font-size: 12.5px;
+      color: #e0f2fe;
+      font-weight: 500;
+    }
+
+    .topbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .status-pill {
+      font-size: 12px;
+      font-weight: 600;
+      padding: 6px 13px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.16);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.32);
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: #34d399;
+      box-shadow: 0 0 8px #34d399;
+    }
+
+    .dot.offline {
+      background: #fbbf24;
+      box-shadow: 0 0 8px #fbbf24;
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      padding: 9px 16px;
+      border-radius: 11px;
+      border: 1px solid transparent;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .btn:hover:not(:disabled) {
+      transform: translateY(-1.5px);
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #0284c7 0%, #0d9488 100%);
+      color: #fff;
+      box-shadow: 0 6px 16px rgba(2, 132, 199, 0.3);
+    }
+
+    .btn-secondary {
+      background: linear-gradient(135deg, #7c3aed 0%, #ec4899 100%);
+      color: #fff;
+      box-shadow: 0 6px 16px rgba(124, 58, 237, 0.28);
+    }
+
+    .btn-success {
+      background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+      color: #fff;
+      box-shadow: 0 6px 16px rgba(16, 185, 129, 0.28);
+    }
+
+    .btn-warning {
+      background: linear-gradient(135deg, #f59e0b 0%, #ea580c 100%);
+      color: #fff;
+      box-shadow: 0 6px 16px rgba(245, 158, 11, 0.3);
+    }
+
+    .btn-danger {
+      background: linear-gradient(135deg, #ef4444 0%, #db2777 100%);
+      color: #fff;
+      box-shadow: 0 6px 16px rgba(239, 68, 68, 0.28);
+    }
+
+    .btn-outline {
+      background: #fff;
+      color: #334155;
+      border-color: #cbd5e1;
+      box-shadow: 0 2px 6px rgba(15, 23, 42, 0.04);
+    }
+
+    .btn-outline:hover:not(:disabled) {
+      background: #f0f9ff;
+      border-color: #38bdf8;
+      color: #0369a1;
+    }
+
+    .btn-ghost-light {
+      background: rgba(255, 255, 255, 0.18);
+      color: #fff;
+      border-color: rgba(255, 255, 255, 0.35);
+    }
+
+    .btn-sm {
+      padding: 7px 12px;
+      font-size: 12.5px;
+      border-radius: 9px;
+    }
+
+    /* Container */
+    .container {
+      max-width: 1380px;
+      margin: 24px auto;
+      padding: 0 18px 56px;
+    }
+
+    /* Card */
+    .card {
+      background: var(--card);
+      backdrop-filter: blur(12px);
+      border-radius: var(--radius);
+      border: 1px solid rgba(255, 255, 255, 0.9);
+      box-shadow: var(--shadow-md);
+      padding: 22px;
+      margin-bottom: 22px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card-accent-top {
+      border-top: 4px solid transparent;
+      border-image: linear-gradient(90deg, #0ea5e9, #10b981, #8b5cf6, #ec4899) 1;
+    }
+
+    .card-header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 18px;
+      padding-bottom: 14px;
+      border-bottom: 1.5px solid #f1f5f9;
+    }
+
+    .card-title {
+      font-size: 17px;
+      font-weight: 800;
+      background: linear-gradient(120deg, #0c4a6e, #0284c7, #059669);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      display: inline-block;
+    }
+
+    .card-subtitle {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    /* Login Box */
+    .login-wrapper {
+      min-height: calc(100vh - 86px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 16px;
+    }
+
+    .login-card {
+      width: 100%;
+      max-width: 465px;
+      background: rgba(255, 255, 255, 0.97);
+      border-radius: 22px;
+      box-shadow: var(--shadow-lg);
+      border: 1px solid rgba(255, 255, 255, 0.92);
+      overflow: hidden;
+    }
+
+    .login-hero {
+      background: linear-gradient(135deg, #0c4a6e 0%, #0284c7 45%, #0d9488 80%, #7c3aed 100%);
+      color: #fff;
+      padding: 32px 26px;
+      text-align: center;
+    }
+
+    .login-emblem {
+      width: 66px;
+      height: 66px;
+      margin: 0 auto 12px;
+      border-radius: 18px;
+      background: linear-gradient(135deg, #34d399 0%, #38bdf8 55%, #c084fc 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      font-weight: 900;
+      color: #fff;
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.22);
+      border: 2.5px solid rgba(255, 255, 255, 0.72);
+    }
+
+    .login-hero h2 {
+      font-size: 21px;
+      font-weight: 800;
+      margin-bottom: 4px;
+    }
+
+    .login-hero p {
+      font-size: 13px;
+      color: #e0f2fe;
+      font-weight: 500;
+    }
+
+    .login-body {
+      padding: 26px 28px 28px;
+    }
+
+    .form-group {
+      margin-bottom: 18px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 7px;
+      color: #334155;
+    }
+
+    .input-group {
+      display: flex;
+      align-items: stretch;
+      border: 2px solid #cbd5e1;
+      border-radius: 12px;
+      overflow: hidden;
+      background: #f8fafc;
+      transition: all 0.2s ease;
+    }
+
+    .input-group:focus-within {
+      border-color: #0284c7;
+      background: #fff;
+      box-shadow: 0 0 0 4px rgba(2, 132, 199, 0.15);
+    }
+
+    .input-group input {
+      flex: 1;
+      border: none;
+      outline: none;
+      background: transparent;
+      padding: 12px 14px;
+      font-size: 15px;
+      font-weight: 800;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      width: 100%;
+      color: #0c4a6e;
+    }
+
+    .input-group button {
+      border: none;
+      background: #e0f2fe;
+      border-left: 1px solid #cbd5e1;
+      padding: 0 15px;
+      font-size: 12.5px;
+      font-weight: 700;
+      color: #0369a1;
+      cursor: pointer;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 10px 13px;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 10px;
+      font-size: 13.5px;
+      outline: none;
+    }
+
+    .form-control:focus {
+      border-color: #0284c7;
+      box-shadow: 0 0 0 3.5px rgba(2, 132, 199, 0.15);
+    }
+
+    .alert {
+      padding: 12px 16px;
+      border-radius: 12px;
+      font-size: 13px;
+      margin-bottom: 16px;
+      border: 1px solid transparent;
+      line-height: 1.5;
+    }
+
+    .alert-danger {
+      background: linear-gradient(135deg, #fef2f2, #ffe4e6);
+      color: #9f1239;
+      border-color: #fecdd3;
+    }
+
+    .alert-warning {
+      background: linear-gradient(135deg, #fffbeb, #fef3c7);
+      color: #92400e;
+      border-color: #fde68a;
+    }
+
+    .alert-info {
+      background: linear-gradient(135deg, #f0f9ff, #ecfdf5);
+      color: #0c4a6e;
+      border-color: #bae6fd;
+    }
+
+    /* Stats Grid */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(235px, 1fr));
+      gap: 16px;
+      margin-bottom: 22px;
+    }
+
+    .stat-card {
+      border-radius: 18px;
+      padding: 20px 22px;
+      color: #fff;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 12px 26px rgba(15, 23, 42, 0.12);
+      transition: transform 0.2s ease;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-3px);
+    }
+
+    .stat-card::after {
+      content: "";
+      position: absolute;
+      width: 110px;
+      height: 110px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.15);
+      right: -24px;
+      bottom: -28px;
+      pointer-events: none;
+    }
+
+    .stat-card.ocean {
+      background: linear-gradient(135deg, #0284c7 0%, #0ea5e9 100%);
+    }
+
+    .stat-card.mint {
+      background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+    }
+
+    .stat-card.violet {
+      background: linear-gradient(135deg, #6d28d9 0%, #8b5cf6 100%);
+    }
+
+    .stat-card.coral {
+      background: linear-gradient(135deg, #f59e0b 0%, #ec4899 100%);
+    }
+
+    .stat-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: rgba(255, 255, 255, 0.88);
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+    }
+
+    .stat-value {
+      font-size: 28px;
+      font-weight: 900;
+      margin-top: 6px;
+      color: #fff;
+    }
+
+    .stat-sub {
+      font-size: 12.5px;
+      color: rgba(255, 255, 255, 0.92);
+      margin-top: 4px;
+      font-weight: 500;
+    }
+
+    /* Podium */
+    .podium-stage {
+      background: linear-gradient(180deg, #f0f9ff 0%, #ecfdf5 65%, #f5f3ff 100%);
+      border-radius: 16px;
+      padding: 24px 14px 0;
+      border: 1px solid #bae6fd;
+    }
+
+    .podium-wrap {
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      gap: 18px;
+      max-width: 780px;
+      margin: 0 auto;
+    }
+
+    .podium-item {
+      flex: 1;
+      max-width: 230px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .podium-crown {
+      font-size: 11.5px;
+      font-weight: 800;
+      padding: 3px 10px;
+      border-radius: 999px;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+    }
+
+    .podium-1 .podium-crown {
+      background: linear-gradient(135deg, #fde047, #f59e0b);
+      color: #78350f;
+    }
+
+    .podium-2 .podium-crown {
+      background: #e2e8f0;
+      color: #334155;
+    }
+
+    .podium-3 .podium-crown {
+      background: #ffedd5;
+      color: #9a3412;
+    }
+
+    .podium-class {
+      font-size: 20px;
+      font-weight: 900;
+      color: #0c4a6e;
+      margin-bottom: 4px;
+    }
+
+    .podium-score {
+      font-size: 13.5px;
+      font-weight: 800;
+      color: #fff;
+      background: linear-gradient(135deg, #0284c7, #059669);
+      padding: 3px 14px;
+      border-radius: 999px;
+      margin-bottom: 10px;
+    }
+
+    .podium-block {
+      width: 100%;
+      border-radius: 16px 16px 0 0;
+      color: #fff;
+      font-weight: 900;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 -4px 18px rgba(0, 0, 0, 0.12);
+    }
+
+    .podium-1 .podium-block {
+      height: 134px;
+      background: linear-gradient(180deg, #fbbf24 0%, #f59e0b 55%, #d97706 100%);
+      font-size: 30px;
+    }
+
+    .podium-2 .podium-block {
+      height: 102px;
+      background: linear-gradient(180deg, #94a3b8 0%, #64748b 60%, #475569 100%);
+      font-size: 24px;
+    }
+
+    .podium-3 .podium-block {
+      height: 80px;
+      background: linear-gradient(180deg, #fb923c 0%, #ea580c 60%, #c2410c 100%);
+      font-size: 21px;
+    }
+
+    .podium-block span {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    /* Tabs */
+    .tabs {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 18px;
+      background: rgba(255, 255, 255, 0.85);
+      padding: 8px;
+      border-radius: 14px;
+      border: 1px solid #e2e8f0;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .tab-btn {
+      padding: 9px 16px;
+      border-radius: 10px;
+      border: 1px solid transparent;
+      background: transparent;
+      font-size: 13px;
+      font-weight: 700;
+      color: #475569;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .tab-btn.active {
+      background: linear-gradient(135deg, #0284c7 0%, #0d9488 60%, #7c3aed 100%);
+      color: #fff;
+      box-shadow: 0 5px 14px rgba(2, 132, 199, 0.3);
+    }
+
+    /* Tables */
+    .table-responsive {
+      width: 100%;
+      overflow-x: auto;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 14px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      background: #fff;
+    }
+
+    th, td {
+      padding: 10px 11px;
+      border-bottom: 1px solid #f1f5f9;
+      text-align: left;
+      vertical-align: middle;
+    }
+
+    th {
+      background: linear-gradient(180deg, #f8fafc 0%, #e0f2fe 100%);
+      font-weight: 800;
+      color: #0c4a6e;
+      white-space: nowrap;
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      border-bottom: 2px solid #bae6fd;
+    }
+
+    tbody tr:nth-child(even) td {
+      background: #f8fafc;
+    }
+
+    tbody tr:hover td {
+      background: #f0f9ff;
+    }
+
+    .text-center { text-align: center; }
+
+    .cell-input {
+      width: 82px;
+      padding: 7px 8px;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 8px;
+      font-size: 13.5px;
+      font-weight: 700;
+      text-align: center;
+      background: #fff;
+      color: #0c4a6e;
+    }
+
+    .cell-input:focus {
+      outline: none;
+      border-color: #0284c7;
+      background: #f0f9ff;
+      box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15);
+    }
+
+    .cell-input:disabled {
+      background: #f1f5f9;
+      color: #64748b;
+    }
+
+    .cell-note {
+      width: 100%;
+      min-width: 165px;
+      padding: 7px 10px;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 8px;
+      font-size: 12.5px;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 11.5px;
+      font-weight: 800;
+    }
+
+    .badge-score {
+      background: linear-gradient(135deg, #e0f2fe, #ccfbf1);
+      color: #0369a1;
+      border: 1px solid #7dd3fc;
+    }
+
+    .badge-total {
+      background: linear-gradient(135deg, #0284c7, #0d9488);
+      color: #fff;
+      font-size: 12.5px;
+    }
+
+    .badge-final {
+      background: linear-gradient(135deg, #059669, #10b981);
+      color: #fff;
+      font-size: 13px;
+    }
+
+    .badge-done {
+      background: #dcfce7;
+      color: #15803d;
+      border: 1px solid #86efac;
+    }
+
+    .badge-pending {
+      background: #f1f5f9;
+      color: #64748b;
+    }
+
+    .rank-pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 34px;
+      padding: 3px 9px;
+      border-radius: 999px;
+      font-weight: 800;
+      font-size: 12px;
+      background: #f1f5f9;
+      color: #334155;
+    }
+
+    .rank-1 { background: linear-gradient(135deg, #fde047, #f59e0b); color: #78350f; }
+    .rank-2 { background: linear-gradient(135deg, #e2e8f0, #94a3b8); color: #1e293b; }
+    .rank-3 { background: linear-gradient(135deg, #fed7aa, #fb923c); color: #7c2d12; }
+
+    .predikat-sangat-baik { background: #dcfce7; color: #065f46; border: 1px solid #6ee7b7; }
+    .predikat-baik { background: #dbeafe; color: #1e40af; border: 1px solid #7dd3fc; }
+    .predikat-cukup { background: #fef3c7; color: #92400e; border: 1px solid #fcd34d; }
+    .predikat-kurang { background: #fee2e2; color: #9f1239; border: 1px solid #fda4af; }
+
+    .progress-bar-bg {
+      width: 100%;
+      height: 12px;
+      background: #e2e8f0;
+      border-radius: 999px;
+      overflow: hidden;
+      margin-top: 7px;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #0284c7 0%, #10b981 55%, #8b5cf6 100%);
+      border-radius: 999px;
+      transition: width 0.3s ease;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 18px;
+    }
+
+    .class-edit-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(135px, 1fr));
+      gap: 10px;
+    }
+
+    .class-edit-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: linear-gradient(135deg, #f8fafc, #f0f9ff);
+      padding: 7px 10px;
+      border-radius: 10px;
+      border: 1px solid #bae6fd;
+    }
+
+    .class-edit-item span {
+      font-size: 12px;
+      font-weight: 800;
+      color: #0284c7;
+      min-width: 24px;
+    }
+
+    .class-edit-item input {
+      width: 100%;
+      padding: 5px 7px;
+      border: 1px solid #cbd5e1;
+      border-radius: 7px;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    pre.code-box {
+      background: linear-gradient(145deg, #0f172a, #0c4a6e);
+      color: #e0f2fe;
+      padding: 16px;
+      border-radius: 12px;
+      font-size: 12px;
+      overflow-x: auto;
+      line-height: 1.5;
+      max-height: 320px;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 22px;
+      right: 22px;
+      background: linear-gradient(135deg, #0c4a6e, #0284c7, #059669);
+      color: #fff;
+      padding: 12px 18px;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 700;
+      box-shadow: 0 10px 25px rgba(2, 132, 199, 0.35);
+      z-index: 999;
+      opacity: 0;
+      transform: translateY(12px);
+      transition: all 0.22s ease;
+      pointer-events: none;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    @media print {
+      body { background: #fff !important; font-size: 11px; }
+      body::before, body::after, .no-print, .topbar, .tabs, .btn, .alert { display: none !important; }
+      .container { max-width: 100%; margin: 0; padding: 0; }
+      .card { box-shadow: none; border: none; padding: 0; margin-bottom: 16px; background: #fff; }
+      .card-title { background: none !important; -webkit-text-fill-color: #000 !important; color: #000 !important; }
+      .print-header { display: block !important; text-align: center; margin-bottom: 16px; border-bottom: 2px solid #000; padding-bottom: 10px; }
+      th, td { border: 1px solid #94a3b8 !important; padding: 5px 6px !important; background: #fff !important; color: #000 !important; }
+      .badge, .rank-pill, .podium-score, .podium-block { background: #f1f5f9 !important; color: #000 !important; border: 1px solid #94a3b8 !important; box-shadow: none !important; }
+    }
+
+    .print-header { display: none; }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navigation -->
+  <header class="topbar no-print">
+    <div class="topbar-inner">
+      <div class="brand">
+        <div class="brand-badge">M&amp;T</div>
+        <div>
+          <h1>Lomba Misting dan Tumbler</h1>
+          <p>SDN 190 Cisaranten Kidul &bull; 23 November &ndash; 4 Desember 2026</p>
+        </div>
+      </div>
+      <div class="topbar-actions">
+        <span class="status-pill">
+          <span class="dot offline" id="syncDot"></span>
+          <span id="syncText">Penyimpanan Lokal</span>
+        </span>
+        <span class="status-pill hidden" id="roleBadge"></span>
+        <button type="button" class="btn btn-ghost-light btn-sm hidden" id="btnLogout" onclick="logout()">Keluar</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- LOGIN VIEW -->
+  <main id="loginView" class="login-wrapper">
+    <div class="login-card">
+      <div class="login-hero">
+        <div class="login-emblem">M&amp;T</div>
+        <h2>Portal Lomba Misting dan Tumbler</h2>
+        <p>SDN 190 Cisaranten Kidul &bull; 31 Kelas Peserta</p>
+      </div>
+      <div class="login-body">
+        <div id="loginError" class="alert alert-danger hidden"></div>
+
+        <form onsubmit="handleLogin(event)">
+          <div class="form-group">
+            <label class="form-label" for="tokenInput">Masukkan Token Akses</label>
+            <div class="input-group">
+              <input
+                type="password"
+                id="tokenInput"
+                placeholder="KETIK TOKEN AKSES"
+                autocomplete="off"
+                oninput="this.value = this.value.toUpperCase()"
+                required
+              />
+              <button type="button" id="btnToggleToken" onclick="toggleTokenVisibility()">Lihat</button>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary" style="width: 100%; padding: 12px; font-size: 14.5px;">
+            Masuk ke Dashboard Rekap
+          </button>
+        </form>
+
+        <div style="margin-top: 14px; display: flex; gap: 10px; flex-wrap: wrap;">
+          <button type="button" class="btn btn-outline btn-sm" style="flex: 1;" onclick="copyJuriLink()">
+            Salin Link Juri
+          </button>
+          <button type="button" class="btn btn-outline btn-sm" style="flex: 1;" onclick="syncFromCloud(true)">
+            Muat Data Cloud
+          </button>
+        </div>
+
+        <p style="margin-top: 16px; font-size: 12px; color: var(--muted); text-align: center;">
+          Gunakan token resmi yang diberikan oleh Panitia Misting &amp; Tumbler SDN 190 Cisaranten Kidul.
+        </p>
+      </div>
+    </div>
+  </main>
+
+  <!-- DASHBOARD VIEW -->
+  <main id="dashboardView" class="container hidden">
+    <div class="print-header">
+      <h2>LAPORAN LOMBA MISTING DAN TUMBLER (31 KELAS)</h2>
+      <p>SDN 190 CISARANTEN KIDUL &bull; PERIODE 23 NOVEMBER &ndash; 4 DESEMBER 2026</p>
+      <p id="printTimestamp" style="font-size: 11px; margin-top: 4px;"></p>
+    </div>
+
+    <!-- JURI PANEL -->
+    <section id="juriPanel" class="hidden">
+      <div id="lockBannerJuri" class="alert alert-warning hidden">
+        <strong>Rekap Dikunci oleh Panitia:</strong> Anda hanya dapat melihat data dan tidak dapat mengubah nilai.
+      </div>
+
+      <div class="card card-accent-top">
+        <div class="card-header">
+          <div>
+            <div class="card-title" id="juriGreeting">Lembar Penilaian Lomba Misting dan Tumbler</div>
+            <div class="card-subtitle">
+              Isi nilai skala <strong>1 - 4</strong> (maksimal 4). Kolom <strong>Capaian (%)</strong> bisa langsung ditempel (Paste) dari Excel.
+            </div>
+          </div>
+          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+            <button type="button" class="btn btn-outline btn-sm" onclick="copyJuriLink()">Salin Link Juri</button>
+            <button type="button" class="btn btn-secondary btn-sm" onclick="syncToCloud(true)">Simpan &amp; Sinkron</button>
+            <button type="button" class="btn btn-danger btn-sm" id="btnResetJuri" onclick="resetMyScores()">Reset Nilai Saya</button>
+          </div>
+        </div>
+
+        <div class="alert alert-info" style="font-size: 12.5px;">
+          <strong>Panduan Bobot &amp; Rumus Nilai Total:</strong>
+          (1) <strong>Capaian Misting &amp; Tumbler (50%)</strong>: otomatis dari input % (&lt;50% = 1, 50-74% = 2, 75-89% = 3, 90-100% = 4) &bull;
+          (2) <strong>Konsistensi Harian (30%)</strong>: skala 1-4 &bull;
+          (3) <strong>Kelayakan / Ketertiban (20%)</strong>: skala 1-4 &bull;
+          <strong>Rumus Total:</strong> <code>(((a &times; 0.50) + (b &times; 0.30) + (c &times; 0.20)) / 4) &times; 100</code>
+        </div>
+
+        <div style="margin-bottom: 18px; background: #f8fafc; padding: 12px 14px; border-radius: 12px; border: 1px solid #e2e8f0;">
+          <div style="display: flex; justify-content: space-between; font-size: 13px; font-weight: 700; color: #0c4a6e;">
+            <span>Progres Kelas Terisi</span>
+            <span id="juriProgressText" style="color: #0284c7;">0 / 31 Kelas (0%)</span>
+          </div>
+          <div class="progress-bar-bg">
+            <div class="progress-bar-fill" id="juriProgressBar" style="width: 0%;"></div>
+          </div>
+        </div>
+
+        <div class="table-responsive">
+          <table>
+            <thead>
+              <tr>
+                <th class="text-center" style="width: 48px;">No</th>
+                <th style="width: 92px;">Kelas</th>
+                <th class="text-center" style="width: 122px;">Capaian (%)<br><small style="font-weight:500;color:#64748b;">Tempel Excel</small></th>
+                <th class="text-center" style="width: 112px;">Skor Persen (a)<br><small style="font-weight:500;color:#64748b;">Bobot 50%</small></th>
+                <th class="text-center" style="width: 118px;">Konsistensi (b)<br><small style="font-weight:500;color:#64748b;">Skala 1-4 (30%)</small></th>
+                <th class="text-center" style="width: 118px;">Kelayakan (c)<br><small style="font-weight:500;color:#64748b;">Skala 1-4 (20%)</small></th>
+                <th class="text-center" style="width: 108px;">Total Juri</th>
+                <th>Catatan Misting &amp; Tumbler</th>
+                <th class="text-center" style="width: 95px;">Status</th>
+              </tr>
+            </thead>
+            <tbody id="juriTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- PANITIA / ADMIN PANEL -->
+    <section id="adminPanel" class="hidden">
+      <div class="stats-grid">
+        <div class="stat-card ocean">
+          <div class="stat-label">Total Kelas Terpantau</div>
+          <div class="stat-value" id="statTotalKelas">31 Kelas</div>
+          <div class="stat-sub">Misting &amp; Tumbler Siswa</div>
+        </div>
+        <div class="stat-card mint">
+          <div class="stat-label">Progres Penilaian</div>
+          <div class="stat-value" id="statProgres">0 / 62</div>
+          <div class="stat-sub" id="statProgresSub">0% entri penilaian masuk</div>
+        </div>
+        <div class="stat-card violet">
+          <div class="stat-label">Rata-Rata Sekolah</div>
+          <div class="stat-value" id="statRataRata">0.00</div>
+          <div class="stat-sub">Dari kelas yang sudah dinilai</div>
+        </div>
+        <div class="stat-card coral">
+          <div class="stat-label">Nilai Tertinggi</div>
+          <div class="stat-value" id="statTertinggi">0.00</div>
+          <div class="stat-sub" id="statTertinggiKelas">Belum ada nilai</div>
+        </div>
+      </div>
+
+      <div class="card card-accent-top">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Podium Klasemen Lomba Misting dan Tumbler (3 Besar)</div>
+            <div class="card-subtitle">Diperbarui otomatis berdasarkan rata-rata nilai total Juri 1 dan Juri 2</div>
+          </div>
+          <div class="no-print" style="display: flex; gap: 8px; flex-wrap: wrap;">
+            <button type="button" class="btn btn-warning btn-sm" id="btnToggleLock" onclick="toggleLock()">Kunci Penilaian</button>
+            <button type="button" class="btn btn-outline btn-sm" onclick="copyJuriLink()">Salin Link Juri</button>
+            <button type="button" class="btn btn-primary btn-sm" onclick="window.print()">Cetak Laporan</button>
+          </div>
+        </div>
+        <div class="podium-stage">
+          <div class="podium-wrap" id="podiumContainer"></div>
+        </div>
+      </div>
+
+      <div class="tabs no-print">
+        <button type="button" class="tab-btn active" data-tab="tabRekap" onclick="switchAdminTab('tabRekap', this)">Rekap Gabungan 31 Kelas</button>
+        <button type="button" class="tab-btn" data-tab="tabKlasemen" onclick="switchAdminTab('tabKlasemen', this)">Klasemen &amp; Predikat</button>
+        <button type="button" class="tab-btn" data-tab="tabKelas" onclick="switchAdminTab('tabKelas', this)">Edit Daftar Kelas</button>
+        <button type="button" class="tab-btn" data-tab="tabToken" onclick="switchAdminTab('tabToken', this)">Pengaturan Token</button>
+        <button type="button" class="tab-btn" data-tab="tabData" onclick="switchAdminTab('tabData', this)">Ekspor / Impor &amp; Google Sheets</button>
+      </div>
+
+      <div id="tabRekap" class="card admin-tab-pane">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Tabel Rekap Gabungan Lomba Misting dan Tumbler (31 Kelas)</div>
+            <div class="card-subtitle">Rincian nilai per juri, Nilai Akhir, serta catatan masing-masing juri</div>
+          </div>
+          <div class="no-print" style="display: flex; gap: 8px; flex-wrap: wrap;">
+            <button type="button" class="btn btn-success btn-sm" onclick="exportCSV()">Unduh CSV / Excel</button>
+            <button type="button" class="btn btn-outline btn-sm" onclick="syncFromCloud(true)">Refresh Data</button>
+          </div>
+        </div>
+
+        <div class="table-responsive">
+          <table>
+            <thead>
+              <tr>
+                <th class="text-center" rowspan="2">No</th>
+                <th rowspan="2">Kelas</th>
+                <th class="text-center" colspan="4" style="background:linear-gradient(180deg,#e0f2fe,#bae6fd);color:#0c4a6e;">Juri 1 (Yusup)</th>
+                <th class="text-center" colspan="4" style="background:linear-gradient(180deg,#d1fae5,#a7f3d0);color:#065f46;">Juri 2 (Suherman)</th>
+                <th class="text-center" rowspan="2" style="background:linear-gradient(180deg,#ede9fe,#ddd6fe);color:#4c1d95;">Nilai Akhir</th>
+                <th rowspan="2">Catatan Juri</th>
+              </tr>
+              <tr>
+                <th class="text-center" style="background:#f0f9ff;color:#0369a1;">Persentase (50%)</th>
+                <th class="text-center" style="background:#f0f9ff;color:#0369a1;">Konsistensi (30%)</th>
+                <th class="text-center" style="background:#f0f9ff;color:#0369a1;">Kelayakan (20%)</th>
+                <th class="text-center" style="background:#e0f2fe;color:#0c4a6e;">Total</th>
+                <th class="text-center" style="background:#ecfdf5;color:#047857;">Persentase (50%)</th>
+                <th class="text-center" style="background:#ecfdf5;color:#047857;">Konsistensi (30%)</th>
+                <th class="text-center" style="background:#ecfdf5;color:#047857;">Kelayakan (20%)</th>
+                <th class="text-center" style="background:#d1fae5;color:#065f46;">Total</th>
+              </tr>
+            </thead>
+            <tbody id="rekapTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div id="tabKlasemen" class="card admin-tab-pane hidden">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Klasemen Lomba Misting dan Tumbler (31 Kelas)</div>
+            <div class="card-subtitle">Diurutkan otomatis dari peringkat #1 ke bawah beserta predikat</div>
+          </div>
+          <div class="no-print" style="display: flex; gap: 8px;">
+            <button type="button" class="btn btn-success btn-sm" onclick="exportCSV()">Unduh CSV / Excel</button>
+            <button type="button" class="btn btn-primary btn-sm" onclick="window.print()">Cetak Klasemen</button>
+          </div>
+        </div>
+        <div class="table-responsive">
+          <table>
+            <thead>
+              <tr>
+                <th class="text-center" style="width: 90px;">Peringkat</th>
+                <th>Kelas</th>
+                <th class="text-center">Total Juri 1</th>
+                <th class="text-center">Total Juri 2</th>
+                <th class="text-center">Nilai Akhir</th>
+                <th class="text-center">Predikat</th>
+              </tr>
+            </thead>
+            <tbody id="klasemenTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div id="tabKelas" class="card admin-tab-pane hidden no-print">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Edit Daftar 31 Kelas Peserta</div>
+            <div class="card-subtitle">Ubah nama kelas jika diperlukan lalu klik Simpan Daftar Kelas</div>
+          </div>
+          <div style="display: flex; gap: 8px;">
+            <button type="button" class="btn btn-outline btn-sm" onclick="resetDefaultClasses()">Reset Nama Kelas Bawaan</button>
+            <button type="button" class="btn btn-primary btn-sm" onclick="saveClassNames()">Simpan Daftar Kelas</button>
+          </div>
+        </div>
+        <div class="class-edit-grid" id="classEditGrid"></div>
+      </div>
+
+      <div id="tabToken" class="card admin-tab-pane hidden no-print">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Pengaturan Token Login</div>
+            <div class="card-subtitle">Semua token wajib diisi, otomatis huruf kapital, dan tidak boleh ada yang sama</div>
+          </div>
+          <button type="button" class="btn btn-outline btn-sm" onclick="resetDefaultTokens()">Reset ke Bawaan</button>
+        </div>
+        <div class="grid-2">
+          <div class="form-group">
+            <label class="form-label">Token Panitia / Admin</label>
+            <input type="text" class="form-control" id="editTokenAdmin" oninput="this.value=this.value.toUpperCase()" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Token Juri 1 (Yusup)</label>
+            <input type="text" class="form-control" id="editTokenJuri1" oninput="this.value=this.value.toUpperCase()" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Token Juri 2 (Suherman)</label>
+            <input type="text" class="form-control" id="editTokenJuri2" oninput="this.value=this.value.toUpperCase()" />
+          </div>
+        </div>
+        <button type="button" class="btn btn-primary" onclick="saveTokens()">Simpan Perubahan Token</button>
+      </div>
+
+      <div id="tabData" class="card admin-tab-pane hidden no-print">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Ekspor / Impor Data &amp; Sinkronisasi Google Sheets</div>
+            <div class="card-subtitle">Cadangkan data secara lokal (JSON/CSV) atau hubungkan ke Google Sheets via Apps Script</div>
+          </div>
+        </div>
+        <div class="grid-2" style="margin-bottom: 20px;">
+          <div style="border: 1.5px solid #bae6fd; background: linear-gradient(135deg,#ffffff,#f0f9ff); border-radius: 14px; padding: 16px;">
+            <h4 style="font-size: 14.5px; color: #0c4a6e; margin-bottom: 6px;">Cadangan File Lokal</h4>
+            <p style="font-size: 12.5px; color: var(--muted); margin-bottom: 14px;">
+              Unduh rekap Excel/CSV atau file cadangan JSON untuk dipulihkan kapan saja.
+            </p>
+            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+              <button type="button" class="btn btn-success btn-sm" onclick="exportCSV()">Unduh CSV / Excel</button>
+              <button type="button" class="btn btn-outline btn-sm" onclick="exportJSON()">Ekspor JSON</button>
+              <label class="btn btn-outline btn-sm" style="cursor: pointer;">
+                Impor JSON
+                <input type="file" accept=".json" class="hidden" onchange="importJSON(event)" />
+              </label>
+            </div>
+          </div>
+          <div style="border: 1.5px solid #a7f3d0; background: linear-gradient(135deg,#ffffff,#ecfdf5); border-radius: 14px; padding: 16px;">
+            <h4 style="font-size: 14.5px; color: #065f46; margin-bottom: 6px;">Koneksi Web App Google Apps Script (Opsional)</h4>
+            <p style="font-size: 12.5px; color: var(--muted); margin-bottom: 10px;">
+              Tempel URL Web App (<code>.../exec</code>). Tombol <strong>Salin Link Juri</strong> akan menyematkan parameter <code>?gas=...</code>.
+            </p>
+            <div class="form-group" style="margin-bottom: 10px;">
+              <input type="url" class="form-control" id="gasUrlInput" placeholder="https://script.google.com/macros/s/.../exec" />
+            </div>
+            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+              <button type="button" class="btn btn-primary btn-sm" onclick="saveGasUrl()">Simpan URL GAS</button>
+              <button type="button" class="btn btn-secondary btn-sm" onclick="syncToCloud(true)">Kirim ke Sheets</button>
+              <button type="button" class="btn btn-outline btn-sm" onclick="syncFromCloud(true)">Tarik dari Sheets</button>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <strong style="font-size: 13.5px; color: #0c4a6e;">Kode Google Apps Script (Code.gs) Siap Salin</strong>
+            <button type="button" class="btn btn-outline btn-sm" onclick="copyCodeGs()">Salin Kode Code.gs</button>
+          </div>
+          <pre class="code-box" id="codeGsBox"></pre>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="toast" class="toast"></div>
+
+  <script>
+    var STORAGE_KEY = "sdn190_misting_tumbler_v1";
+    var SESSION_KEY = "sdn190_misting_tumbler_session_v1";
+    var CHANNEL_NAME = "sdn190_misting_tumbler_channel";
+
+    var DEFAULT_CLASSES = [
+      "1A", "1B", "1C", "1D", "1E",
+      "2A", "2B", "2C", "2D", "2E", "2F",
+      "3A", "3B", "3C", "3D", "3E",
+      "4A", "4B", "4C", "4D", "4E",
+      "5A", "5B", "5C", "5D", "5E",
+      "6A", "6B", "6C", "6D", "6E"
+    ];
+
+    var DEFAULT_TOKENS = {
+      admin: "PANITIA-190",
+      juri1: "YUMAMAI-190",
+      juri2: "SUHERMAN-190"
+    };
+
+    var JURI_NAMES = {
+      juri1: "Yusup",
+      juri2: "Suherman"
+    };
+
+    var CODE_GS_TEMPLATE = [
+      "function doGet(e) {",
+      "  var ss = SpreadsheetApp.getActiveSpreadsheet();",
+      "  var sheet = ss.getSheetByName('DataMistingTumbler') || ss.insertSheet('DataMistingTumbler');",
+      "  var raw = sheet.getRange('A1').getValue();",
+      "  var output = raw ? raw : JSON.stringify({ status: 'empty' });",
+      "  return ContentService.createTextOutput(output).setMimeType(ContentService.MimeType.JSON);",
+      "}",
+      "",
+      "function doPost(e) {",
+      "  var ss = SpreadsheetApp.getActiveSpreadsheet();",
+      "  var sheet = ss.getSheetByName('DataMistingTumbler') || ss.insertSheet('DataMistingTumbler');",
+      "  var rekap = ss.getSheetByName('RekapMistingTumbler') || ss.insertSheet('RekapMistingTumbler');",
+      "  var body = e.postData && e.postData.contents ? e.postData.contents : '{}';",
+      "  sheet.getRange('A1').setValue(body);",
+      "  sheet.getRange('A2').setValue('Terakhir diperbarui: ' + new Date());",
+      "  try {",
+      "    var parsed = JSON.parse(body);",
+      "    if (parsed && parsed.rekapRows && parsed.rekapRows.length) {",
+      "      rekap.clear();",
+      "      rekap.getRange(1, 1, parsed.rekapRows.length, parsed.rekapRows[0].length).setValues(parsed.rekapRows);",
+      "    }",
+      "  } catch (err) {}",
+      "  return ContentService.createTextOutput(JSON.stringify({ status: 'ok' })).setMimeType(ContentService.MimeType.JSON);",
+      "}"
+    ].join("\n");
+
+    var appState = {
+      classes: DEFAULT_CLASSES.slice(),
+      tokens: Object.assign({}, DEFAULT_TOKENS),
+      locked: false,
+      gasUrl: "",
+      updatedAt: 0,
+      scores: {
+        juri1: {},
+        juri2: {}
+      }
+    };
+
+    var currentRole = null;
+    var bc = null;
+    var syncTimer = null;
+
+    function initApp() {
+      document.getElementById("codeGsBox").textContent = CODE_GS_TEMPLATE;
+      loadState();
+      checkUrlGasParam();
+      setupCrossTabSync();
+
+      var savedRole = sessionStorage.getItem(SESSION_KEY);
+      if (savedRole && (savedRole === "admin" || savedRole === "juri1" || savedRole === "juri2")) {
+        currentRole = savedRole;
+        showDashboard();
+      } else {
+        showLogin();
+      }
+
+      if (appState.gasUrl) {
+        updateSyncIndicator(true, "Terhubung Google Sheets");
+        syncFromCloud(false);
+        startAutoPoll();
+      }
+    }
+
+    function createEmptyScores(classList) {
+      var res = { juri1: {}, juri2: {} };
+      for (var i = 0; i < classList.length; i++) {
+        var idx = String(i);
+        res.juri1[idx] = { capaian: "", a: "", b: "", c: "", note: "" };
+        res.juri2[idx] = { capaian: "", a: "", b: "", c: "", note: "" };
+      }
+      return res;
+    }
+
+    function loadState() {
+      try {
+        var raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) {
+          var parsed = JSON.parse(raw);
+          if (parsed && Array.isArray(parsed.classes) && parsed.classes.length === 31) {
+            appState.classes = parsed.classes;
+          }
+          if (parsed && parsed.tokens) {
+            appState.tokens = Object.assign({}, DEFAULT_TOKENS, parsed.tokens);
+          }
+          appState.locked = Boolean(parsed.locked);
+          appState.gasUrl = parsed.gasUrl || "";
+          appState.updatedAt = parsed.updatedAt || 0;
+          var baseScores = createEmptyScores(appState.classes);
+          if (parsed.scores) {
+            ["juri1", "juri2"].forEach(function (jKey) {
+              if (parsed.scores[jKey]) {
+                for (var i = 0; i < 31; i++) {
+                  var k = String(i);
+                  if (parsed.scores[jKey][k]) {
+                    baseScores[jKey][k] = Object.assign(baseScores[jKey][k], parsed.scores[jKey][k]);
+                  }
+                }
+              }
+            });
+          }
+          appState.scores = baseScores;
+        } else {
+          appState.scores = createEmptyScores(appState.classes);
+          saveState(false);
+        }
+      } catch (e) {
+        appState.scores = createEmptyScores(appState.classes);
+      }
+    }
+
+    function saveState(triggerCloud) {
+      appState.updatedAt = Date.now();
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
+      if (bc) {
+        try {
+          bc.postMessage({ type: "STATE_UPDATED", state: appState });
+        } catch (e) {}
+      }
+      if (triggerCloud) { lastLocalEditAt = Date.now(); }
+      if (triggerCloud && appState.gasUrl) {
+        clearTimeout(syncTimer);
+        syncTimer = setTimeout(function () {
+          syncToCloud(false);
+        }, 1200);
+      }
+    }
+
+    function setupCrossTabSync() {
+      if ("BroadcastChannel" in window) {
+        bc = new BroadcastChannel(CHANNEL_NAME);
+        bc.onmessage = function (ev) {
+          if (ev.data && ev.data.type === "STATE_UPDATED" && ev.data.state) {
+            appState = ev.data.state;
+            if (currentRole) renderDashboard();
+          }
+        };
+      }
+      window.addEventListener("storage", function (ev) {
+        if (ev.key === STORAGE_KEY && ev.newValue) {
+          loadState();
+          if (currentRole) renderDashboard();
+        }
+      });
+    }
+
+    function checkUrlGasParam() {
+      try {
+        var params = new URLSearchParams(window.location.search);
+        var gas = params.get("gas");
+        if (gas && gas.trim()) {
+          appState.gasUrl = gas.trim();
+          saveState(false);
+        }
+      } catch (e) {}
+    }
+
+    function showToast(msg) {
+      var el = document.getElementById("toast");
+      el.textContent = msg;
+      el.classList.add("show");
+      clearTimeout(el._t);
+      el._t = setTimeout(function () {
+        el.classList.remove("show");
+      }, 2800);
+    }
+
+    function updateSyncIndicator(online, text) {
+      var dot = document.getElementById("syncDot");
+      var label = document.getElementById("syncText");
+      if (online) {
+        dot.classList.remove("offline");
+      } else {
+        dot.classList.add("offline");
+      }
+      label.textContent = text;
+    }
+
+    function toggleTokenVisibility() {
+      var input = document.getElementById("tokenInput");
+      var btn = document.getElementById("btnToggleToken");
+      if (input.type === "password") {
+        input.type = "text";
+        btn.textContent = "Sembunyi";
+      } else {
+        input.type = "password";
+        btn.textContent = "Lihat";
+      }
+    }
+
+    function handleLogin(e) {
+      e.preventDefault();
+      var raw = document.getElementById("tokenInput").value.trim().toUpperCase();
+      var errEl = document.getElementById("loginError");
+      errEl.classList.add("hidden");
+
+      if (!raw) {
+        errEl.textContent = "Silakan masukkan token akses terlebih dahulu.";
+        errEl.classList.remove("hidden");
+        return;
+      }
+
+      if (raw === appState.tokens.admin.trim().toUpperCase()) {
+        currentRole = "admin";
+      } else if (raw === appState.tokens.juri1.trim().toUpperCase()) {
+        currentRole = "juri1";
+      } else if (raw === appState.tokens.juri2.trim().toUpperCase()) {
+        currentRole = "juri2";
+      } else {
+        errEl.textContent = "Token tidak valid. Periksa kembali token Anda atau hubungi Panitia.";
+        errEl.classList.remove("hidden");
+        return;
+      }
+
+      sessionStorage.setItem(SESSION_KEY, currentRole);
+      document.getElementById("tokenInput").value = "";
+      showDashboard();
+      showToast("Berhasil masuk sebagai " + getRoleLabel(currentRole));
+    }
+
+    function logout() {
+      currentRole = null;
+      sessionStorage.removeItem(SESSION_KEY);
+      showLogin();
+    }
+
+    function getRoleLabel(role) {
+      if (role === "admin") return "Panitia / Admin";
+      if (role === "juri1") return "Juri 1 (" + JURI_NAMES.juri1 + ")";
+      if (role === "juri2") return "Juri 2 (" + JURI_NAMES.juri2 + ")";
+      return "";
+    }
+
+    function showLogin() {
+      document.getElementById("loginView").classList.remove("hidden");
+      document.getElementById("dashboardView").classList.add("hidden");
+      document.getElementById("roleBadge").classList.add("hidden");
+      document.getElementById("btnLogout").classList.add("hidden");
+    }
+
+    function showDashboard() {
+      document.getElementById("loginView").classList.add("hidden");
+      document.getElementById("dashboardView").classList.remove("hidden");
+
+      var badge = document.getElementById("roleBadge");
+      badge.textContent = getRoleLabel(currentRole);
+      badge.classList.remove("hidden");
+      document.getElementById("btnLogout").classList.remove("hidden");
+
+      if (currentRole === "admin") {
+        document.getElementById("adminPanel").classList.remove("hidden");
+        document.getElementById("juriPanel").classList.add("hidden");
+      } else {
+        document.getElementById("juriPanel").classList.remove("hidden");
+        document.getElementById("adminPanel").classList.add("hidden");
+      }
+
+      renderDashboard();
+    }
+
+    function copyJuriLink() {
+      var baseUrl = window.location.href.split("?")[0].split("#")[0];
+      var shareUrl = baseUrl;
+      if (appState.gasUrl) {
+        shareUrl += "?gas=" + encodeURIComponent(appState.gasUrl);
+      }
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(shareUrl).then(function () {
+          showToast("Link Juri berhasil disalin!");
+        }).catch(function () {
+          fallbackCopy(shareUrl);
+        });
+      } else {
+        fallbackCopy(shareUrl);
+      }
+    }
+
+    function fallbackCopy(text) {
+      var ta = document.createElement("textarea");
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand("copy");
+      document.body.removeChild(ta);
+      showToast("Link Juri berhasil disalin!");
+    }
+
+    function capaianToScore(val) {
+      if (val === "" || val === null || val === undefined) return "";
+      var num = parseFloat(String(val).replace("%", "").replace(",", ".").trim());
+      if (isNaN(num)) return "";
+      if (num < 50) return 1;
+      if (num < 75) return 2;
+      if (num < 90) return 3;
+      return 4;
+    }
+
+    function calcJuriTotal(entry) {
+      if (!entry) return null;
+      var a = parseFloat(entry.a);
+      var b = parseFloat(entry.b);
+      var c = parseFloat(entry.c);
+      if (isNaN(a) || isNaN(b) || isNaN(c)) return null;
+      var total = (((a * 0.50) + (b * 0.30) + (c * 0.20)) / 4) * 100;
+      return Math.round(total * 100) / 100;
+    }
+
+    function getPredikat(score) {
+      if (score === null || isNaN(score)) return { text: "Belum Dinilai", cls: "badge-pending" };
+      if (score >= 90) return { text: "Sangat Baik", cls: "predikat-sangat-baik" };
+      if (score >= 75) return { text: "Baik", cls: "predikat-baik" };
+      if (score >= 60) return { text: "Cukup", cls: "predikat-cukup" };
+      return { text: "Perlu Pembinaan", cls: "predikat-kurang" };
+    }
+
+    function renderDashboard() {
+      document.getElementById("printTimestamp").textContent = "Dicetak pada: " + new Date().toLocaleString("id-ID");
+      if (currentRole === "admin") {
+        renderAdminDashboard();
+      } else if (currentRole === "juri1" || currentRole === "juri2") {
+        renderJuriDashboard();
+      }
+    }
+
+    function renderJuriDashboard() {
+      var jKey = currentRole;
+      var jScores = appState.scores[jKey];
+      var locked = appState.locked;
+
+      document.getElementById("juriGreeting").textContent = "Lembar Lomba Misting dan Tumbler — " + getRoleLabel(jKey);
+      document.getElementById("lockBannerJuri").classList.toggle("hidden", !locked);
+      document.getElementById("btnResetJuri").disabled = locked;
+
+      var tbody = document.getElementById("juriTableBody");
+      var html = "";
+      var doneCount = 0;
+
+      for (var i = 0; i < appState.classes.length; i++) {
+        var idx = String(i);
+        var clsName = appState.classes[i];
+        var item = jScores[idx] || { capaian: "", a: "", b: "", c: "", note: "" };
+        var total = calcJuriTotal(item);
+        var isDone = total !== null;
+        if (isDone) doneCount++;
+
+        html += "<tr>";
+        html += "<td class=\"text-center\" style=\"font-weight:700;color:#64748b;\">" + (i + 1) + "</td>";
+        html += "<td><strong style=\"color:#0c4a6e;font-size:14px;\">" + escapeHtml(clsName) + "</strong></td>";
+        html += "<td class=\"text-center\"><input type=\"text\" class=\"cell-input\" data-idx=\"" + i + "\" data-field=\"capaian\" value=\"" + escapeHtml(item.capaian) + "\" placeholder=\"0-100\" " + (locked ? "disabled" : "") + " oninput=\"onJuriInput(this)\" onpaste=\"handleExcelPaste(event, " + i + ")\" /></td>";
+        html += "<td class=\"text-center\"><span class=\"badge badge-score\" id=\"scoreA_" + i + "\">" + (item.a !== "" ? item.a : "-") + "</span></td>";
+        html += "<td class=\"text-center\"><input type=\"number\" step=\"0.1\" min=\"1\" max=\"4\" class=\"cell-input\" data-idx=\"" + i + "\" data-field=\"b\" value=\"" + escapeHtml(item.b) + "\" placeholder=\"1-4\" " + (locked ? "disabled" : "") + " oninput=\"onJuriInput(this)\" /></td>";
+        html += "<td class=\"text-center\"><input type=\"number\" step=\"0.1\" min=\"1\" max=\"4\" class=\"cell-input\" data-idx=\"" + i + "\" data-field=\"c\" value=\"" + escapeHtml(item.c) + "\" placeholder=\"1-4\" " + (locked ? "disabled" : "") + " oninput=\"onJuriInput(this)\" /></td>";
+        html += "<td class=\"text-center\"><span class=\"badge badge-total\" id=\"totalJuri_" + i + "\">" + (total !== null ? total.toFixed(2) : "-") + "</span></td>";
+        html += "<td><input type=\"text\" class=\"cell-note\" data-idx=\"" + i + "\" data-field=\"note\" value=\"" + escapeHtml(item.note) + "\" placeholder=\"Catatan misting/tumbler...\" " + (locked ? "disabled" : "") + " oninput=\"onJuriNote(this)\" /></td>";
+        html += "<td class=\"text-center\"><span class=\"badge " + (isDone ? "badge-done" : "badge-pending") + "\" id=\"statusJuri_" + i + "\">" + (isDone ? "Selesai" : "Belum") + "</span></td>";
+        html += "</tr>";
+      }
+
+      tbody.innerHTML = html;
+      updateJuriProgress(doneCount);
+    }
+
+    function updateJuriProgress(doneCount) {
+      var total = appState.classes.length;
+      var pct = Math.round((doneCount / total) * 100);
+      document.getElementById("juriProgressText").textContent = doneCount + " / " + total + " Kelas (" + pct + "%)";
+      document.getElementById("juriProgressBar").style.width = pct + "%";
+    }
+
+    function onJuriInput(el) {
+      if (appState.locked) return;
+      var idx = el.getAttribute("data-idx");
+      var field = el.getAttribute("data-field");
+      var jScores = appState.scores[currentRole];
+      var item = jScores[idx];
+
+      if (field === "capaian") {
+        var raw = el.value;
+        item.capaian = raw;
+        var num = parseFloat(String(raw).replace("%", "").replace(",", ".").trim());
+        if (!isNaN(num) && num > 100) {
+          num = 100;
+          el.value = "100";
+          item.capaian = "100";
+        }
+        item.a = capaianToScore(item.capaian);
+        document.getElementById("scoreA_" + idx).textContent = item.a !== "" ? item.a : "-";
+      } else if (field === "b" || field === "c") {
+        if (el.value === "") {
+          item[field] = "";
+        } else {
+          var v = parseFloat(el.value);
+          if (!isNaN(v)) {
+            if (v > 4) {
+              v = 4;
+              el.value = "4";
+            } else if (v < 0) {
+              v = 1;
+              el.value = "1";
+            }
+            item[field] = v;
+          }
+        }
+      }
+
+      var total = calcJuriTotal(item);
+      document.getElementById("totalJuri_" + idx).textContent = total !== null ? total.toFixed(2) : "-";
+      var statusEl = document.getElementById("statusJuri_" + idx);
+      if (total !== null) {
+        statusEl.textContent = "Selesai";
+        statusEl.className = "badge badge-done";
+      } else {
+        statusEl.textContent = "Belum";
+        statusEl.className = "badge badge-pending";
+      }
+
+      var doneCount = 0;
+      for (var i = 0; i < 31; i++) {
+        if (calcJuriTotal(jScores[String(i)]) !== null) doneCount++;
+      }
+      updateJuriProgress(doneCount);
+      saveState(true);
+    }
+
+    function onJuriNote(el) {
+      if (appState.locked) return;
+      var idx = el.getAttribute("data-idx");
+      appState.scores[currentRole][idx].note = el.value;
+      saveState(true);
+    }
+
+    function handleExcelPaste(e, startIdx) {
+      if (appState.locked) return;
+      var clip = (e.clipboardData || window.clipboardData).getData("text");
+      if (!clip) return;
+      var lines = clip.split(/\r\n|\n|\r/).filter(function (line) {
+        return line.trim() !== "";
+      });
+      if (lines.length <= 1 && lines[0].indexOf("\t") === -1) return;
+
+      e.preventDefault();
+      var jScores = appState.scores[currentRole];
+      var applied = 0;
+
+      for (var offset = 0; offset < lines.length; offset++) {
+        var targetIdx = startIdx + offset;
+        if (targetIdx >= 31) break;
+        var cols = lines[offset].split("\t");
+        var cellVal = cols[0].replace("%", "").replace(",", ".").trim();
+        var num = parseFloat(cellVal);
+        if (!isNaN(num)) {
+          if (num > 100) num = 100;
+          if (num < 0) num = 0;
+          var key = String(targetIdx);
+          jScores[key].capaian = String(num);
+          jScores[key].a = capaianToScore(num);
+          applied++;
+        }
+      }
+
+      saveState(true);
+      renderJuriDashboard();
+      showToast(applied + " data capaian berhasil ditempel dari Excel!");
+    }
+
+    function resetMyScores() {
+      if (appState.locked) return;
+      if (!confirm("Yakin ingin menghapus seluruh nilai yang sudah Anda isi?")) return;
+      for (var i = 0; i < 31; i++) {
+        appState.scores[currentRole][String(i)] = { capaian: "", a: "", b: "", c: "", note: "" };
+      }
+      saveState(true);
+      renderJuriDashboard();
+      showToast("Seluruh nilai Anda berhasil direset.");
+    }
+
+    function buildSummaryRows() {
+      var rows = [];
+      for (var i = 0; i < appState.classes.length; i++) {
+        var idx = String(i);
+        var clsName = appState.classes[i];
+        var j1 = appState.scores.juri1[idx] || {};
+        var j2 = appState.scores.juri2[idx] || {};
+        var t1 = calcJuriTotal(j1);
+        var t2 = calcJuriTotal(j2);
+        var finalScore = null;
+
+        if (t1 !== null && t2 !== null) {
+          finalScore = Math.round(((t1 + t2) / 2) * 100) / 100;
+        } else if (t1 !== null) {
+          finalScore = t1;
+        } else if (t2 !== null) {
+          finalScore = t2;
+        }
+
+        var notes = [];
+        if (j1.note && j1.note.trim()) notes.push("J1: " + j1.note.trim());
+        if (j2.note && j2.note.trim()) notes.push("J2: " + j2.note.trim());
+
+        rows.push({
+          index: i,
+          kelas: clsName,
+          j1: j1,
+          j2: j2,
+          t1: t1,
+          t2: t2,
+          finalScore: finalScore,
+          notes: notes.join(" | ")
+        });
+      }
+      return rows;
+    }
+
+    function renderAdminDashboard() {
+      var rows = buildSummaryRows();
+      var totalEntries = 0;
+      var sumSchool = 0;
+      var scoredClasses = 0;
+      var highestScore = -1;
+      var highestClass = "-";
+
+      for (var i = 0; i < rows.length; i++) {
+        var r = rows[i];
+        if (r.t1 !== null) totalEntries++;
+        if (r.t2 !== null) totalEntries++;
+        if (r.finalScore !== null) {
+          sumSchool += r.finalScore;
+          scoredClasses++;
+          if (r.finalScore > highestScore) {
+            highestScore = r.finalScore;
+            highestClass = r.kelas;
+          }
+        }
+      }
+
+      var avgSchool = scoredClasses > 0 ? (sumSchool / scoredClasses).toFixed(2) : "0.00";
+      var progPct = Math.round((totalEntries / 62) * 100);
+
+      document.getElementById("statTotalKelas").textContent = appState.classes.length + " Kelas";
+      document.getElementById("statProgres").textContent = totalEntries + " / 62";
+      document.getElementById("statProgresSub").textContent = progPct + "% entri penilaian (2 juri)";
+      document.getElementById("statRataRata").textContent = avgSchool;
+      document.getElementById("statTertinggi").textContent = highestScore >= 0 ? highestScore.toFixed(2) : "0.00";
+      document.getElementById("statTertinggiKelas").textContent = highestScore >= 0 ? "Diraih oleh Kelas " + highestClass : "Belum ada nilai masuk";
+
+      var btnLock = document.getElementById("btnToggleLock");
+      if (appState.locked) {
+        btnLock.textContent = "Buka Kunci Penilaian";
+        btnLock.className = "btn btn-danger btn-sm";
+      } else {
+        btnLock.textContent = "Kunci Penilaian";
+        btnLock.className = "btn btn-warning btn-sm";
+      }
+
+      var ranked = rows.slice().sort(function (a, b) {
+        var sa = a.finalScore !== null ? a.finalScore : -1;
+        var sb = b.finalScore !== null ? b.finalScore : -1;
+        if (sb !== sa) return sb - sa;
+        return a.index - b.index;
+      });
+
+      renderPodium(ranked);
+      renderRekapTable(rows);
+      renderKlasemenTable(ranked);
+      renderClassEditGrid();
+
+      document.getElementById("editTokenAdmin").value = appState.tokens.admin;
+      document.getElementById("editTokenJuri1").value = appState.tokens.juri1;
+      document.getElementById("editTokenJuri2").value = appState.tokens.juri2;
+      document.getElementById("gasUrlInput").value = appState.gasUrl || "";
+    }
+
+    function renderPodium(ranked) {
+      var top1 = ranked[0] || { kelas: "-", finalScore: null };
+      var top2 = ranked[1] || { kelas: "-", finalScore: null };
+      var top3 = ranked[2] || { kelas: "-", finalScore: null };
+
+      var order = [
+        { rank: 2, cls: "podium-2", crown: "Perak", label: "Juara 2", data: top2 },
+        { rank: 1, cls: "podium-1", crown: "Emas Utama", label: "Juara 1", data: top1 },
+        { rank: 3, cls: "podium-3", crown: "Perunggu", label: "Juara 3", data: top3 }
+      ];
+
+      var html = "";
+      for (var i = 0; i < order.length; i++) {
+        var item = order[i];
+        var scoreStr = item.data.finalScore !== null ? item.data.finalScore.toFixed(2) : "0.00";
+        var kelasStr = item.data.finalScore !== null ? "Kelas " + escapeHtml(item.data.kelas) : "-";
+        html += "<div class=\"podium-item " + item.cls + "\">";
+        html += "<div class=\"podium-crown\">" + item.crown + "</div>";
+        html += "<div class=\"podium-class\">" + kelasStr + "</div>";
+        html += "<div class=\"podium-score\">" + scoreStr + "</div>";
+        html += "<div class=\"podium-block\">#" + item.rank + "<span>" + item.label + "</span></div>";
+        html += "</div>";
+      }
+      document.getElementById("podiumContainer").innerHTML = html;
+    }
+
+    function renderRekapTable(rows) {
+      var tbody = document.getElementById("rekapTableBody");
+      var html = "";
+      for (var i = 0; i < rows.length; i++) {
+        var r = rows[i];
+        html += "<tr>";
+        html += "<td class=\"text-center\" style=\"font-weight:700;color:#64748b;\">" + (i + 1) + "</td>";
+        html += "<td><strong style=\"color:#0c4a6e;font-size:13.5px;\">" + escapeHtml(r.kelas) + "</strong></td>";
+        var j1PersenStr = (r.j1.capaian !== "" && r.j1.capaian !== undefined)
+          ? (escapeHtml(r.j1.capaian) + "% <small style=\"color:#0369a1;font-weight:700;\">(" + (r.j1.a !== "" ? r.j1.a : "-") + ")</small>")
+          : (r.j1.a !== "" ? ("<small style=\"color:#0369a1;font-weight:700;\">Skor " + r.j1.a + "</small>") : "-");
+        var j2PersenStr = (r.j2.capaian !== "" && r.j2.capaian !== undefined)
+          ? (escapeHtml(r.j2.capaian) + "% <small style=\"color:#047857;font-weight:700;\">(" + (r.j2.a !== "" ? r.j2.a : "-") + ")</small>")
+          : (r.j2.a !== "" ? ("<small style=\"color:#047857;font-weight:700;\">Skor " + r.j2.a + "</small>") : "-");
+        html += "<td class=\"text-center\">" + j1PersenStr + "</td>";
+        html += "<td class=\"text-center\">" + (r.j1.b !== "" ? r.j1.b : "-") + "</td>";
+        html += "<td class=\"text-center\">" + (r.j1.c !== "" ? r.j1.c : "-") + "</td>";
+        html += "<td class=\"text-center\" style=\"background:#f0f9ff;color:#0c4a6e;font-weight:800;\">" + (r.t1 !== null ? r.t1.toFixed(2) : "-") + "</td>";
+        html += "<td class=\"text-center\">" + j2PersenStr + "</td>";
+        html += "<td class=\"text-center\">" + (r.j2.b !== "" ? r.j2.b : "-") + "</td>";
+        html += "<td class=\"text-center\">" + (r.j2.c !== "" ? r.j2.c : "-") + "</td>";
+        html += "<td class=\"text-center\" style=\"background:#ecfdf5;color:#065f46;font-weight:800;\">" + (r.t2 !== null ? r.t2.toFixed(2) : "-") + "</td>";
+        html += "<td class=\"text-center\"><span class=\"badge badge-final\">" + (r.finalScore !== null ? r.finalScore.toFixed(2) : "-") + "</span></td>";
+        html += "<td style=\"font-size:12px; color:#475569;\">" + (r.notes ? escapeHtml(r.notes) : "-") + "</td>";
+        html += "</tr>";
+      }
+      tbody.innerHTML = html;
+    }
+
+    function renderKlasemenTable(ranked) {
+      var tbody = document.getElementById("klasemenTableBody");
+      var html = "";
+      for (var i = 0; i < ranked.length; i++) {
+        var r = ranked[i];
+        var pred = getPredikat(r.finalScore);
+        var rankCls = i === 0 ? "rank-1" : (i === 1 ? "rank-2" : (i === 2 ? "rank-3" : ""));
+        html += "<tr>";
+        html += "<td class=\"text-center\"><span class=\"rank-pill " + rankCls + "\">#" + (i + 1) + "</span></td>";
+        html += "<td><strong style=\"color:#0c4a6e;font-size:14px;\">Kelas " + escapeHtml(r.kelas) + "</strong></td>";
+        html += "<td class=\"text-center\" style=\"font-weight:700;color:#0369a1;\">" + (r.t1 !== null ? r.t1.toFixed(2) : "-") + "</td>";
+        html += "<td class=\"text-center\" style=\"font-weight:700;color:#047857;\">" + (r.t2 !== null ? r.t2.toFixed(2) : "-") + "</td>";
+        html += "<td class=\"text-center\"><span class=\"badge badge-final\">" + (r.finalScore !== null ? r.finalScore.toFixed(2) : "-") + "</span></td>";
+        html += "<td class=\"text-center\"><span class=\"badge " + pred.cls + "\">" + pred.text + "</span></td>";
+        html += "</tr>";
+      }
+      tbody.innerHTML = html;
+    }
+
+    function switchAdminTab(tabId, btnEl) {
+      var panes = document.querySelectorAll(".admin-tab-pane");
+      for (var i = 0; i < panes.length; i++) {
+        panes[i].classList.add("hidden");
+      }
+      document.getElementById(tabId).classList.remove("hidden");
+
+      var btns = document.querySelectorAll(".tab-btn");
+      for (var j = 0; j < btns.length; j++) {
+        btns[j].classList.remove("active");
+      }
+      btnEl.classList.add("active");
+    }
+
+    function toggleLock() {
+      appState.locked = !appState.locked;
+      saveState(true);
+      renderAdminDashboard();
+      showToast(appState.locked ? "Penilaian berhasil dikunci." : "Kunci penilaian dibuka kembali.");
+    }
+
+    function renderClassEditGrid() {
+      var grid = document.getElementById("classEditGrid");
+      var html = "";
+      for (var i = 0; i < appState.classes.length; i++) {
+        html += "<div class=\"class-edit-item\">";
+        html += "<span>" + (i + 1) + ".</span>";
+        html += "<input type=\"text\" id=\"clsInput_" + i + "\" value=\"" + escapeHtml(appState.classes[i]) + "\" />";
+        html += "</div>";
+      }
+      grid.innerHTML = html;
+    }
+
+    function saveClassNames() {
+      var updated = [];
+      for (var i = 0; i < 31; i++) {
+        var val = document.getElementById("clsInput_" + i).value.trim();
+        if (!val) {
+          alert("Nama kelas nomor " + (i + 1) + " tidak boleh kosong.");
+          return;
+        }
+        updated.push(val);
+      }
+      appState.classes = updated;
+      saveState(true);
+      renderAdminDashboard();
+      showToast("Daftar 31 kelas peserta berhasil disimpan.");
+    }
+
+    function resetDefaultClasses() {
+      if (!confirm("Kembalikan seluruh nama kelas ke daftar bawaan?")) return;
+      appState.classes = DEFAULT_CLASSES.slice();
+      saveState(true);
+      renderAdminDashboard();
+      showToast("Nama kelas dikembalikan ke bawaan.");
+    }
+
+    function saveTokens() {
+      var tAdmin = document.getElementById("editTokenAdmin").value.trim().toUpperCase();
+      var tJuri1 = document.getElementById("editTokenJuri1").value.trim().toUpperCase();
+      var tJuri2 = document.getElementById("editTokenJuri2").value.trim().toUpperCase();
+
+      if (!tAdmin || !tJuri1 || !tJuri2) {
+        alert("Semua token wajib diisi dan tidak boleh kosong.");
+        return;
+      }
+      if (tAdmin === tJuri1 || tAdmin === tJuri2 || tJuri1 === tJuri2) {
+        alert("Setiap token harus unik dan tidak boleh ada yang sama.");
+        return;
+      }
+
+      appState.tokens = {
+        admin: tAdmin,
+        juri1: tJuri1,
+        juri2: tJuri2
+      };
+      saveState(true);
+      showToast("Pengaturan token berhasil diperbarui.");
+    }
+
+    function resetDefaultTokens() {
+      if (!confirm("Reset semua token ke pengaturan bawaan?")) return;
+      appState.tokens = Object.assign({}, DEFAULT_TOKENS);
+      saveState(true);
+      renderAdminDashboard();
+      showToast("Token berhasil direset ke bawaan.");
+    }
+
+    function exportCSV() {
+      var rows = buildSummaryRows();
+      var ranked = rows.slice().sort(function (a, b) {
+        var sa = a.finalScore !== null ? a.finalScore : -1;
+        var sb = b.finalScore !== null ? b.finalScore : -1;
+        return sb - sa;
+      });
+      var rankMap = {};
+      for (var rIdx = 0; rIdx < ranked.length; rIdx++) {
+        rankMap[ranked[rIdx].index] = rIdx + 1;
+      }
+
+      var header = [
+        "No", "Kelas",
+        "J1 Capaian (%)", "J1 Skor Persen (50%)", "J1 Konsistensi (30%)", "J1 Kelayakan (20%)", "Total Juri 1",
+        "J2 Capaian (%)", "J2 Skor Persen (50%)", "J2 Konsistensi (30%)", "J2 Kelayakan (20%)", "Total Juri 2",
+        "Nilai Akhir", "Peringkat", "Predikat", "Catatan Juri"
+      ];
+
+      var csvLines = [header.map(csvEscape).join(",")];
+      for (var i = 0; i < rows.length; i++) {
+        var item = rows[i];
+        var pred = getPredikat(item.finalScore).text;
+        var line = [
+          i + 1,
+          item.kelas,
+          item.j1.capaian || "",
+          item.j1.a || "",
+          item.j1.b || "",
+          item.j1.c || "",
+          item.t1 !== null ? item.t1.toFixed(2) : "",
+          item.j2.capaian || "",
+          item.j2.a || "",
+          item.j2.b || "",
+          item.j2.c || "",
+          item.t2 !== null ? item.t2.toFixed(2) : "",
+          item.finalScore !== null ? item.finalScore.toFixed(2) : "",
+          rankMap[item.index],
+          pred,
+          item.notes
+        ];
+        csvLines.push(line.map(csvEscape).join(","));
+      }
+
+      var csvContent = "\uFEFF" + csvLines.join("\r\n");
+      var blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+      downloadBlob(blob, "Lomba_Misting_dan_Tumbler_SDN190.csv");
+      showToast("File CSV / Excel berhasil diunduh.");
+    }
+
+    function csvEscape(val) {
+      var str = String(val === null || val === undefined ? "" : val);
+      if (str.indexOf(",") !== -1 || str.indexOf("\"") !== -1 || str.indexOf("\n") !== -1) {
+        return "\"" + str.replace(/"/g, "\"\"") + "\"";
+      }
+      return str;
+    }
+
+    function exportJSON() {
+      var blob = new Blob([JSON.stringify(appState, null, 2)], { type: "application/json" });
+      downloadBlob(blob, "Backup_Lomba_Misting_dan_Tumbler_SDN190.json");
+      showToast("File cadangan JSON berhasil diunduh.");
+    }
+
+    function importJSON(event) {
+      var file = event.target.files[0];
+      if (!file) return;
+      var reader = new FileReader();
+      reader.onload = function (e) {
+        try {
+          var imported = JSON.parse(e.target.result);
+          if (!imported || !Array.isArray(imported.classes) || !imported.scores) {
+            throw new Error("Format JSON tidak sesuai.");
+          }
+          appState = imported;
+          saveState(true);
+          renderDashboard();
+          showToast("Data JSON berhasil dipulihkan!");
+        } catch (err) {
+          alert("Gagal mengimpor JSON: " + err.message);
+        }
+      };
+      reader.readAsText(file);
+      event.target.value = "";
+    }
+
+    function downloadBlob(blob, filename) {
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    var pollTimer = null;
+    var lastLocalEditAt = 0;
+
+    function startAutoPoll() {
+      clearInterval(pollTimer);
+      if (!appState.gasUrl) return;
+      pollTimer = setInterval(function () {
+        if (!currentRole || !appState.gasUrl) return;
+        if (document.activeElement && (document.activeElement.tagName === "INPUT" || document.activeElement.tagName === "TEXTAREA")) {
+          return;
+        }
+        if (Date.now() - lastLocalEditAt < 3000) return;
+        syncFromCloud(false);
+      }, 5000);
+    }
+
+    function saveGasUrl() {
+      var url = document.getElementById("gasUrlInput").value.trim();
+      appState.gasUrl = url;
+      saveState(false);
+      if (url) {
+        updateSyncIndicator(true, "Terhubung Google Sheets");
+        startAutoPoll();
+        syncToCloud(false);
+        showToast("URL Google Apps Script disimpan & disinkronkan.");
+      } else {
+        clearInterval(pollTimer);
+        updateSyncIndicator(false, "Penyimpanan Lokal");
+        showToast("Koneksi Google Sheets dinonaktifkan.");
+      }
+    }
+
+    function buildRekapMatrix() {
+      var rows = buildSummaryRows();
+      var matrix = [["No", "Kelas", "Total Juri 1", "Total Juri 2", "Nilai Akhir", "Predikat", "Catatan"]];
+      for (var i = 0; i < rows.length; i++) {
+        var r = rows[i];
+        matrix.push([
+          i + 1,
+          r.kelas,
+          r.t1 !== null ? r.t1 : "",
+          r.t2 !== null ? r.t2 : "",
+          r.finalScore !== null ? r.finalScore : "",
+          getPredikat(r.finalScore).text,
+          r.notes
+        ]);
+      }
+      return matrix;
+    }
+
+    function syncToCloud(manual) {
+      if (!appState.gasUrl) {
+        if (manual) alert("URL Web App Google Apps Script belum diatur oleh Panitia.");
+        return;
+      }
+      updateSyncIndicator(true, "Menyinkronkan...");
+      var payload = Object.assign({}, appState, { rekapRows: buildRekapMatrix() });
+      fetch(appState.gasUrl, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify(payload)
+      }).then(function () {
+        updateSyncIndicator(true, "Tersinkron ke Sheets");
+        if (manual) showToast("Data berhasil dikirim ke Google Sheets.");
+      }).catch(function () {
+        updateSyncIndicator(false, "Gagal Sinkron");
+        if (manual) showToast("Gagal terhubung ke Google Sheets.");
+      });
+    }
+
+    function syncFromCloud(manual) {
+      if (!appState.gasUrl) {
+        if (manual) alert("URL Web App Google Apps Script belum diatur.");
+        return;
+      }
+      updateSyncIndicator(true, "Memuat data...");
+      var cacheBustUrl = appState.gasUrl + (appState.gasUrl.indexOf("?") === -1 ? "?_t=" : "&_t=") + Date.now();
+      fetch(cacheBustUrl)
+        .then(function (res) { return res.json(); })
+        .then(function (data) {
+          if (data && Array.isArray(data.classes) && data.scores) {
+            var cloudTime = Number(data.updatedAt || 0);
+            var localTime = Number(appState.updatedAt || 0);
+            var prevSerialized = JSON.stringify({ classes: appState.classes, scores: appState.scores, locked: appState.locked });
+            if (manual || cloudTime >= localTime || localTime === 0) {
+              if (Array.isArray(data.classes) && data.classes.length === 31) {
+                appState.classes = data.classes;
+              }
+              var merged = createEmptyScores(appState.classes);
+              ["juri1", "juri2"].forEach(function (jKey) {
+                if (data.scores[jKey]) {
+                  for (var i = 0; i < 31; i++) {
+                    var k = String(i);
+                    if (data.scores[jKey][k]) {
+                      merged[jKey][k] = Object.assign(merged[jKey][k], data.scores[jKey][k]);
+                    }
+                  }
+                }
+              });
+              appState.scores = merged;
+              appState.locked = Boolean(data.locked);
+              if (data.tokens) appState.tokens = Object.assign({}, DEFAULT_TOKENS, data.tokens);
+              appState.updatedAt = cloudTime || Date.now();
+              localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
+              var nextSerialized = JSON.stringify({ classes: appState.classes, scores: appState.scores, locked: appState.locked });
+              if (currentRole && (manual || prevSerialized !== nextSerialized)) {
+                renderDashboard();
+              }
+            }
+          }
+          updateSyncIndicator(true, "Terhubung Google Sheets");
+          if (manual) showToast("Data terbaru berhasil dimuat dari Google Sheets.");
+        })
+        .catch(function () {
+          updateSyncIndicator(false, "Offline / Lokal");
+          if (manual) showToast("Gagal memuat data dari Google Sheets.");
+        });
+    }
+
+    function copyCodeGs() {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(CODE_GS_TEMPLATE).then(function () {
+          showToast("Kode Code.gs berhasil disalin!");
+        });
+      } else {
+        fallbackCopy(CODE_GS_TEMPLATE);
+      }
+    }
+
+    function escapeHtml(str) {
+      if (str === null || str === undefined) return "";
+      return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+    }
+
+    window.addEventListener("DOMContentLoaded", initApp);
+  </script>
+</body>
+</html>
